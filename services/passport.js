@@ -44,18 +44,16 @@ passport.use(
 			//other option is telling passport to trust herokus proxy
 			//! PROXY TRUE TELLS PASSPORT TO USE PROXIES AND THEY ARE SAFE
 		},
-		(accessToken, refreshToken, profile, done, req, res) => {
+		(accessToken, refreshToken, profile, done) => {
 			Users.findOne({ googleId: profile.id }).then(existingUser => {
 				if (existingUser) {
-					//found user
+					// we already have a record with the given profile ID
 					done(null, existingUser);
 				} else {
-					// no user found make a new record
-					const user = new Users({ googleId: profile.id });
-
-					user.save().then(newUser => {
-						done(null, newUser);
-					});
+					// we don't have a user record with this ID, make a new record!
+					new Users({ googleId: profile.id })
+						.save()
+						.then(user => done(null, user));
 				}
 			});
 		},
