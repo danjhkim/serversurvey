@@ -2,6 +2,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cookieSession = require('cookie-session');
 const passport = require('passport');
+if (process.env.NODE_ENV !== 'production') {
+	require('dotenv').config();
+}
+
 const keys = require('./config/keys');
 
 //condense require just loads everything and runs it
