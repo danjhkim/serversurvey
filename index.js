@@ -14,11 +14,11 @@ const { Passport } = require('passport');
 const app = express();
 
 //middleware cookie setting encrypt and how long it says 30 days
-//extracting cookiedata
+//extracting cookiedata.
 app.use(
 	cookieSession({
 		maxAge: 30 * 24 * 60 * 60 * 1000,
-		keys: keys.cookieKey,
+		keys: [keys.cookieKey],
 	}),
 );
 //both required to apply the initalization and persistent login session.
