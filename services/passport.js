@@ -36,6 +36,13 @@ passport.use(
 			clientID: keys.googleClientID,
 			clientSecret: keys.googleClientSecret,
 			callbackURL: '/auth/google/callback',
+			proxy: true,
+			//when providing a relative path, it gives u flexibilty
+			// when going through heroku it goes with a heroku specific special proxy
+			// which makes passport think it shouldnt send secure
+			// one way is to write the full heroku address so like :https://heroku.app/blajbla
+			//other option is telling passport to trust herokus proxy
+			//! PROXY TRUE TELLS PASSPORT TO USE PROXIES AND THEY ARE SAFE
 		},
 		(accessToken, refreshToken, profile, done, req, res) => {
 			Users.findOne({ googleId: profile.id }).then(existingUser => {
