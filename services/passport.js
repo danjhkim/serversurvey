@@ -4,9 +4,9 @@ const keys = require('../config/keys');
 const Users = require('../models/User');
 
 //! done() function. It is an internal PASSPORT js function that takes care of
-// !supplying user credentials after user is authenticated successfully.
-// !This function attaches the email id to the request object so that it is
-// !available on the callback url inside req.
+// ! supplying user credentials after user is authenticated successfully.
+// ! This function attaches the email id to the request object so that it is
+// ! available on the callback url inside req.
 
 // the user argument is existingUser or newUser so whatever was just retrieved from database.
 
@@ -44,18 +44,16 @@ passport.use(
 			//other option is telling passport to trust herokus proxy
 			//! PROXY TRUE TELLS PASSPORT TO USE PROXIES AND THEY ARE SAFE
 		},
-		(accessToken, refreshToken, profile, done) => {
-			Users.findOne({ googleId: profile.id }).then(existingUser => {
-				if (existingUser) {
-					// we already have a record with the given profile ID
-					done(null, existingUser);
-				} else {
-					// we don't have a user record with this ID, make a new record!
-					new Users({ googleId: profile.id })
-						.save()
-						.then(user => done(null, user));
-				}
-			});
+		async (accessToken, refreshToken, profile, done) => {
+			const existingUser = await Users.findOne({ googleId: profile.id });
+
+			if (existingUser) {
+				// we already have a record with the given profile ID
+				return done(null, existingUser);
+			}
+			// we don't have a user record with this ID, make a new record!
+			const user = await new User({ googleId: profile.id }).save();
+			done(null, user);
 		},
 	),
 );

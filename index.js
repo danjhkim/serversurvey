@@ -8,7 +8,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const keys = require('./config/keys');
 
-//condense require just loads everything and runs it
+//condense form of require just loads everything and runs it
 require('./services/passport');
 require('./models/User');
 
@@ -34,9 +34,21 @@ mongoose
 	.then(result => console.log('connected to db'))
 	.catch(err => console.log(err));
 
+app.get('/api/logout', (req, res) => {
+	req.logout();
+	res.redirect('/');
+});
+
+app.get('/api/current_user', (req, res) => {
+	// res.send(req.session); <-- shows the id that is asscioated with the users in the database based on
+	// mongodb id... once you have that its basically using the cookie to ASSICOATE the user with the account.
+	res.send(req.user);
+});
+
 app.use('/auth', authRoutes);
 
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
 	console.log(`Listening port ${PORT}`);
 });

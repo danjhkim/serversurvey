@@ -16,19 +16,11 @@ router.get(
 	}),
 );
 
-//! this route hanlder will have a google key/code in the address signifying it has permission. thats why the one above looks the same but
-//! produces a different result. one auths one redirects
-router.get('/google/callback', passport.authenticate('google'));
-
-router.get('/logout', (req, res) => {
-	req.logout();
-	res.redirect('/');
-});
-
-router.get('/current_user', (req, res) => {
-	// res.send(req.session); <-- shows the id that is asscioated with the users in the database based on
-	// mongodb id... once you have that its basically using the cookie to ASSICOATE the user with the account.
-	res.send(req.user);
+//! this route hanlder will have a google key/code in the address signifying it has permission.
+//! after it redirects if login is successful
+//! will get redirected to /google/callback after successful login, then authentic then redirec to surveys
+router.get('/google/callback', passport.authenticate('google'), (req, res) => {
+	res.redirect('/surveys');
 });
 
 module.exports = router;
