@@ -13,9 +13,14 @@ require('./services/passport');
 require('./models/User');
 
 const authRoutes = require('./routes/authRoutes');
-const { Passport } = require('passport');
+const billingRoutes = require('./routes/billingRoutes');
 
 const app = express();
+
+// takes all the url info and passes onto object. usefel for FORM DATA
+app.use(express.json());
+//or
+//app.use(express.urlencoded({ extended: true }));
 
 //middleware cookie setting encrypt and how long it says 30 days
 //extracting cookiedata.
@@ -34,18 +39,28 @@ mongoose
 	.then(result => console.log('connected to db'))
 	.catch(err => console.log(err));
 
-app.get('/api/logout', (req, res) => {
-	req.logout();
-	res.redirect('/');
-});
+app.use(authRoutes);
 
-app.get('/api/current_user', (req, res) => {
-	// res.send(req.session); <-- shows the id that is asscioated with the users in the database based on
-	// mongodb id... once you have that its basically using the cookie to ASSICOATE the user with the account.
-	res.send(req.user);
-});
+app.use(billingRoutes);
 
-app.use('/auth', authRoutes);
+//! note this is without react,  with react u need a conditional that says if you find it in react package
+//! send it if not check backend     the example is below
+// app.use(express.static('public'));
+
+if (process.env.NODE_ENV === 'production') {
+	//if in production and the routes arent in authroutes anb billingroutes check react
+	const path = require('path');
+
+	// serve production assets e.g. main.js if route exists
+	//! checking reach folders
+	app.use(express.static(path.resolve(__dirname, '../client/build')));
+
+	// serve index.html if route is not recognized
+	//! if not found just send the index.html
+	app.get('*', (req, res) => {
+		res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
+	});
+}
 
 const PORT = process.env.PORT || 5000;
 

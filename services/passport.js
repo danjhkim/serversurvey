@@ -12,11 +12,13 @@ const Users = require('../models/User');
 
 // serializeUser determines which data of the user object should be stored in the session (cookie).
 //user is basically the same as req.id
+// Tells passport how to turn user into cookie and stuff id in
 passport.serializeUser((user, done) => {
 	done(null, user.id);
 });
 
-// REMOVE COOKIE
+// Tells passport how to turn cookie back into user  !!IMPORTANT
+// returns CURRENT user object from db into req.user  !!IMPORTANT
 passport.deserializeUser((id, done) => {
 	Users.findById(id)
 		.then(user => {
