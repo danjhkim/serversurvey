@@ -48,17 +48,14 @@ app.use(billingRoutes);
 // app.use(express.static('public'));
 
 if (process.env.NODE_ENV === 'production') {
-	//if in production and the routes arent in authroutes anb billingroutes check react
 	const path = require('path');
 
 	// serve production assets e.g. main.js if route exists
-	//! checking reach folders
-	app.use(express.static('client/build'));
+	app.use(express.static(path.resolve(__dirname, '../client/build')));
 
 	// serve index.html if route is not recognized
-	//! if not found just send the index.html
 	app.get('*', (req, res) => {
-		res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+		res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
 	});
 }
 
