@@ -1,7 +1,7 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const keys = require('../config/keys');
-const Users = require('../models/User');
+const User = require('../models/User');
 
 //! done() function. It is an internal PASSPORT js function that takes care of
 // ! supplying user credentials after user is authenticated successfully.
@@ -20,7 +20,7 @@ passport.serializeUser((user, done) => {
 // Tells passport how to turn cookie back into user  !!IMPORTANT
 // returns CURRENT user object from db into req.user  !!IMPORTANT
 passport.deserializeUser((id, done) => {
-	Users.findById(id)
+	User.findById(id)
 		.then(user => {
 			done(null, user);
 		})
@@ -47,7 +47,7 @@ passport.use(
 			//! PROXY TRUE TELLS PASSPORT TO USE PROXIES AND THEY ARE SAFE
 		},
 		async (accessToken, refreshToken, profile, done) => {
-			const existingUser = await Users.findOne({ googleId: profile.id });
+			const existingUser = await User.findOne({ googleId: profile.id });
 
 			if (existingUser) {
 				// we already have a record with the given profile ID

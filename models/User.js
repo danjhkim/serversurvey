@@ -12,8 +12,9 @@ const userSchema = new Schema({
 	},
 });
 
-const users = mongoose.model('user', userSchema);
-module.exports = users;
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;
 // the FIRSDT parameter "Blog" is important cuz it will look into db and look for the plural of it so in MONGODB it will look for "Blogs"
 //capitals are not important
 
