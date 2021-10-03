@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import * as actions from '../actions';
 //note this client said stripe Checkout doesnt actually charge the credit card
 // u just get an authorization to. You have to setup an actual charge on the backend
-// that swhat the action creator does. connects to backend to complete charge.
+// thats what the action creator does. connects to backend to complete charge.
 
 class Payments extends Component {
 	render() {
@@ -15,6 +15,7 @@ class Payments extends Component {
 				amount={500}
 				token={token => {
 					this.props.handleToken(token);
+					// this is the authorized token to make the charge u pass it to the backend
 				}}
 				stripeKey={process.env.REACT_APP_STRIPE_KEY}>
 				<button className='btn'>Add Credits</button>

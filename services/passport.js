@@ -2,23 +2,29 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const keys = require('../config/keys');
 const User = require('../models/User');
+// this is a model call User it allows u manipulate and save it to the database
 
 //! done() function. It is an internal PASSPORT js function that takes care of
-// ! supplying user credentials after user is authenticated successfully.
+//  supplying user credentials after user is authenticated successfully.
 // ! This function attaches the email id to the request object so that it is
-// ! available on the callback url inside req.
+//  available on the callback url inside req OBJECT
 
-// the user argument is existingUser or newUser so whatever was just retrieved from database.
+// the user argument is existingUser or newUser so whatever was just retrieved from database. look at the bottom of this file the passport code
 
-// serializeUser determines which data of the user object should be stored in the session (cookie).
 //user is basically the same as req.id
-// Tells passport how to turn user into cookie and stuff id in
+
+//serializeUser determines which data of the user object should be stored in the  COOKIE.
+// user.id is from mongodb  __id is what u are geting u dont need the undercores __.
+//we use this mongodb id because IF you have multiple ways to login ei. google facebook email/password.. not all those will have a googleid
+// SO we use the mongodb id which is unique to each entry
+
+//! this is the actual auth association to the mongodb ID to the user.
 passport.serializeUser((user, done) => {
 	done(null, user.id);
 });
 
-// Tells passport how to turn cookie back into user  !!IMPORTANT
-// returns CURRENT user object from db into req.user  !!IMPORTANT
+// we are only sending out the user.id thats why the first arugment is only id
+// this done sends the info to the req.body  IMPORANT ITS ALL IN THE REQ NOW!!!!!  REQ = currently loaded user from DATABASE
 passport.deserializeUser((id, done) => {
 	User.findById(id)
 		.then(user => {
@@ -47,7 +53,11 @@ passport.use(
 			//! PROXY TRUE TELLS PASSPORT TO USE PROXIES AND THEY ARE SAFE
 		},
 		async (accessToken, refreshToken, profile, done) => {
+			//accesstoken is the code that allows us to get the google info from the account
+			///refreshtroken allows an ability to refresh the access token
+			//! profile is the passport argument that took the info from google.
 			const existingUser = await User.findOne({ googleId: profile.id });
+			// find googlid thats the same as the profile.id
 
 			if (existingUser) {
 				// we already have a record with the given profile ID
@@ -56,6 +66,11 @@ passport.use(
 			// we don't have a user record with this ID, make a new record!
 			const user = await new User({ googleId: profile.id }).save();
 			done(null, user);
+
+			//! both these dones will send the user record to serializeUser  this entire part is only finding an existing user or creating anew one.
+			//! serialize  then finds the mongodb ID and makes it the association between the db and client
+			//! deserialize uses that id then retrieves the infomartion from the db.
+			//! 1. ITS ALWAYS GOOGLE TO PASSPORT.  2. FIND USER OR CREATE.  3. FIND ID. 4. GET INFO
 		},
 	),
 );

@@ -15,23 +15,27 @@ require('./models/Survey');
 
 const authRoutes = require('./routes/authRoutes');
 const billingRoutes = require('./routes/billingRoutes');
+const surveyRoutes = require('./routes/surveyRoutes');
 
 const app = express();
 
-// takes all the url info and passes onto object. usefel for FORM DATA
+// recognizes incoming put and post as json objects
+//! note u need this as well as a client side json.stringify()
+//! although axios covers that for you.
 app.use(express.json());
 //or
+//the bottom is for html post form. .json alone wont show html post forms
 //app.use(express.urlencoded({ extended: true }));
 
 //middleware cookie setting encrypt and how long it says 30 days
-//extracting cookiedata.
+//this helps extracting cookiedata.
 app.use(
 	cookieSession({
 		maxAge: 30 * 24 * 60 * 60 * 1000,
 		keys: [keys.cookieKey],
 	}),
 );
-//both required to apply the initalization and persistent login session.
+//both required to apply the initalization and use cookie sessions.b
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -44,9 +48,9 @@ app.use(authRoutes);
 
 app.use(billingRoutes);
 
+app.use(surveyRoutes);
+
 //! note this is without react,  with react u need a conditional that says if you find it in react package
-//! send it if not check backend     the example is below
-// app.use(express.static('public'));
 
 if (process.env.NODE_ENV === 'production') {
 	//if in production and the routes arent in authroutes anb billingroutes check react

@@ -1,16 +1,13 @@
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-
-import history from '../history';
+import { useDispatch } from 'react-redux';
 
 import * as actions from '../actions/';
 
 import Header from './Header';
 import Landing from './Landing';
-
-const Dashboard = () => <h2>dashboard</h2>;
-const SurveryNew = () => <h2>survey</h2>;
+import Dashboard from './Dashboard';
+import SurveyNew from './surveys/SurveyNew';
 
 function App() {
 	const dispatch = useDispatch();
@@ -33,7 +30,7 @@ function App() {
 								<Dashboard />
 							</Route>
 							<Route exact path='/surveys/new'>
-								<SurveryNew />
+								<SurveyNew />
 							</Route>
 						</Switch>
 					</div>
