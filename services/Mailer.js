@@ -10,7 +10,7 @@ class Mailer extends helper.Mail {
 		super();
 
 		this.sgApi = sendgrid(keys.sendGridKey);
-		this.from_email = new helper.Email('poapud@gmail.com');
+		this.from_email = new helper.Email('danportfoliomessage@gmail.com');
 		this.subject = subject;
 		this.body = new helper.Content('text/html', content);
 		this.recipients = this.formatAddresses(recipients);
@@ -44,16 +44,25 @@ class Mailer extends helper.Mail {
 	}
 
 	addRecipients() {
-		const personalize = new helper.Personalization();
-		//one email
+		// const personalize = new helper.Personalization();
+		// console.log(personalize);
+		// //one email
+
+		// this.recipients.forEach(recipient => {
+		// 	personalize.addTo(recipient);
+		// 	// take the array of emails provided by this.recipients and for each add to personalize.
+		// });
+
+		// this.addPersonalization(personalize);
+		// console.log(this.addPersonalization(personalize));
+		// // this just finalizes the personalize emails
 
 		this.recipients.forEach(recipient => {
+			const personalize = new helper.Personalization();
 			personalize.addTo(recipient);
 			// take the array of emails provided by this.recipients and for each add to personalize.
+			this.addPersonalization(personalize);
 		});
-
-		this.addPersonalization(personalize);
-		// this just finalizes the personalize emails
 	}
 
 	async send() {

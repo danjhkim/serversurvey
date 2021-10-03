@@ -18,7 +18,7 @@ const SurveyList = () => {
 						<span className='card-title'>{item.title}</span>
 						<p>{item.body}</p>
 						<p className='right'>
-							Seny On :{' '}
+							Sent On :{' '}
 							{new Date(item.dateSent).toLocaleDateString()}
 						</p>
 					</div>
