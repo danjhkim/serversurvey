@@ -53,6 +53,7 @@ app.use(surveyRoutes);
 //! note this is without react,  with react u need a conditional that says if you find it in react package
 
 if (process.env.NODE_ENV === 'production') {
+	//! only production cuz development u dont wanna constantly build you just run dev on client and setup a proxy
 	//if in production and the routes arent in authroutes anb billingroutes check react
 	const path = require('path');
 

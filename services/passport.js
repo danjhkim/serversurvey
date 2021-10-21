@@ -14,17 +14,19 @@ const User = require('../models/User');
 //user is basically the same as req.id
 
 //serializeUser determines which data of the user object should be stored in the  COOKIE.
-// user.id is from mongodb  __id is what u are geting u dont need the undercores __.
+// user.id is from mongodb  __id is what u are geting u dont need the undercores __ due to mongoose.
 //we use this mongodb id because IF you have multiple ways to login ei. google facebook email/password.. not all those will have a googleid
 // SO we use the mongodb id which is unique to each entry
 
 //! this is the actual auth association to the mongodb ID to the user.
+//! serialize  then finds the mongodb ID and makes it the association between the db and client
 passport.serializeUser((user, done) => {
 	done(null, user.id);
 });
 
 // we are only sending out the user.id thats why the first arugment is only id
 // this done sends the info to the req.body  IMPORANT ITS ALL IN THE REQ NOW!!!!!  REQ = currently loaded user from DATABASE
+//! deserialize uses that id then retrieves the infomartion from the db and puts it in the req.body
 passport.deserializeUser((id, done) => {
 	User.findById(id)
 		.then(user => {
@@ -67,7 +69,7 @@ passport.use(
 			const user = await new User({ googleId: profile.id }).save();
 			done(null, user);
 
-			//! both these dones will send the user record to serializeUser  this entire part is only finding an existing user or creating anew one.
+			// both these dones will send the user record to serializeUser  this entire part is only finding an existing user or creating anew one.
 			//! serialize  then finds the mongodb ID and makes it the association between the db and client
 			//! deserialize uses that id then retrieves the infomartion from the db.
 			//! 1. ITS ALWAYS GOOGLE TO PASSPORT.  2. FIND USER OR CREATE.  3. FIND ID. 4. GET INFO
