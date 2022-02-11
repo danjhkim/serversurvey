@@ -8,7 +8,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const keys = require('./config/keys');
 
-//condense form of require just loads everything and runs it!
+//condense form of require just loads everything and runs it
 require('./services/passport');
 require('./models/User');
 require('./models/Survey');

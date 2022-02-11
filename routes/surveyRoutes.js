@@ -17,6 +17,9 @@ router.get('/api/surveys', requireLogin, async (req, res) => {
 	const { id } = req.user;
 	const surveys = await Survey.find({ _user: id })
 		.select({ recipients: 0 })
+		// select basically removes the recipients cuz the field is uncessary and large
+		// 0 or -recipients   mean exclude   whereas 1 or +recipients means include
+		// $nin is for arrays including or excluding items within the array
 		.sort({ dateSent: -1 })
 		.then(result => {
 			res.send(result);
@@ -97,6 +100,7 @@ router.post('/api/surveys/webhooks', (req, res) => {
 			// confirming if url matches pathname
 			/// "api/surveys/6152043aee71317754ff2b3c/no"
 			//? path parser library tests and returns desstructed params as variables
+
 			if (match) {
 				return {
 					email,
@@ -104,23 +108,43 @@ router.post('/api/surveys/webhooks', (req, res) => {
 					choice: match.choice,
 				};
 			}
+			//! the match is saying if the test pass that means the url matches p
+			//! therefore this post request is most certainly from the webhook that we want
+			//! which is the click from sendGrid. So we only return those and we now have a new
+			//! array of only the events we want.
 		})
 		.compact()
+		// compact removes undefined elements
 		.uniqBy('email', 'surveyId')
+		//if any duplicates of email and surveyid remove them
+		//? this is only removed if both of them are within the same object.
+		//? allowing the same email to have multiple suverys that are different
 		.each(({ surveyId, email, choice }) => {
+			// let survey = await Survery.findById(surveyId)
+			// survey.recipients.find(recipient => recipiient.emai === email && !recipiient.email)
+			// survey.ricipients.id(responder_id).responded = true;
+			//! the above way is bad cuz the sub document of recipients might be extremely long
+			// big O notiation would be O of cubed?
+			//! its not performant thus for each object we use updateOne
+			//? also findandupdateone which returns a document
+			//! in the case where you will draw large data, u can narrow ur search with more paramaters
 			Survey.updateOne(
 				// mongodb syntax from here
+				// for each object update mongo db
 				{
 					_id: surveyId,
 					//when its mongoose id is ok for _id when working internally with mongo u have to specifically use _id
 					recipients: {
 						$elemMatch: { email: email, responded: false },
+						// this matches id and email and responded false
+						//! if responded is true it wont count so only the first vote counts.
 					},
 				},
 				{
 					//$inc increments a field by set amount
 					$inc: { [choice]: 1 },
 					// $ between recipients and responded signifies that you are going into nested level schema
+					// refers to the elemmatch earlier
 					$set: { 'recipients.$.responded': true },
 					lastResponded: new Date(),
 
@@ -132,9 +156,11 @@ router.post('/api/surveys/webhooks', (req, res) => {
 			).exec();
 			//exec is needed to execute the actual query othe other routes dont need this because
 			// they are only building the query object however this is actually building
-			// then EXECUTING
+			//! look at the get one u are just setuping it up and the execution of it happens when the route gets calls right?
+			//? we need .exec() because we need to manually exec it
 		})
 		.value();
+	//value is what is needed with lodash chaining to return final value
 
 	res.send({});
 });
