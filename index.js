@@ -8,7 +8,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const keys = require('./config/keys');
 
-//condense form of require just loads everything and runs it
+//condense form of require just loads everything and runs it!
 require('./services/passport');
 require('./models/User');
 require('./models/Survey');
@@ -22,6 +22,7 @@ const app = express();
 // recognizes incoming put and post as json objects
 //! note u need this as well as a client side json.stringify()
 //! although axios covers that for you.
+//todo ORDER OF MIDDLEWARE MATTERS MAKE SURE JSON IS BEFORE ROUTES
 app.use(express.json());
 //or
 //the bottom is for html post form. .json alone wont show html post forms

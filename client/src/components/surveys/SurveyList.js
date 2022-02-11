@@ -29,7 +29,7 @@ const SurveyList = () => {
 							Yes: {item.yes}
 						</span>
 						<span className='white-text waves-effect waves-light btn'>
-							No: {item.yes}
+							No: {item.no}
 						</span>
 					</div>
 				</div>

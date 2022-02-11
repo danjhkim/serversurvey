@@ -2,7 +2,6 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const keys = require('../config/keys');
 const User = require('../models/User');
-// this is a model call User it allows u manipulate and save it to the database
 
 //! done() function. It is an internal PASSPORT js function that takes care of
 //  supplying user credentials after user is authenticated successfully.
@@ -13,7 +12,9 @@ const User = require('../models/User');
 
 //user is basically the same as req.id
 
-//serializeUser determines which data of the user object should be stored in the  COOKIE.
+//serializeUser determines which data of the user object should be stored in the session.
+
+//! req.user is passportjs created through done
 // user.id is from mongodb  __id is what u are geting u dont need the undercores __ due to mongoose.
 //we use this mongodb id because IF you have multiple ways to login ei. google facebook email/password.. not all those will have a googleid
 // SO we use the mongodb id which is unique to each entry
@@ -26,7 +27,7 @@ passport.serializeUser((user, done) => {
 
 // we are only sending out the user.id thats why the first arugment is only id
 // this done sends the info to the req.body  IMPORANT ITS ALL IN THE REQ NOW!!!!!  REQ = currently loaded user from DATABASE
-//! deserialize uses that id then retrieves the infomartion from the db and puts it in the req.body
+//! deserialize uses that id then retrieves the infomartion from the db and puts it in the req.user
 passport.deserializeUser((id, done) => {
 	User.findById(id)
 		.then(user => {
@@ -70,8 +71,8 @@ passport.use(
 			done(null, user);
 
 			// both these dones will send the user record to serializeUser  this entire part is only finding an existing user or creating anew one.
-			//! serialize  then finds the mongodb ID and makes it the association between the db and client
-			//! deserialize uses that id then retrieves the infomartion from the db.
+			//! serialize create session with user.id
+			//! deserialize uses id and adds it to req.body
 			//! 1. ITS ALWAYS GOOGLE TO PASSPORT.  2. FIND USER OR CREATE.  3. FIND ID. 4. GET INFO
 		},
 	),

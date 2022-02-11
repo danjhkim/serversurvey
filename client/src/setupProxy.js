@@ -9,6 +9,9 @@ module.exports = function (app) {
 };
 
 // THIS proxies all client requests to the backend address
+// REMMBER THIS FORWARDS THE REQUEST TO THE SPECIFIED ADDRESS
+
+// IT DOESNT ACTUALLY DEAL WTH CORS IF THE BACKEND WONT ACCEPT IT
 
 //react looks for a file of this name and uses it.
 

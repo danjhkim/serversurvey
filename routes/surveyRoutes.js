@@ -51,12 +51,18 @@ router.post('/api/surveys', requireLogin, requireCredits, async (req, res) => {
 
 	//send a mail
 	//surveytemplate is a function that will be called with survey as the argument
+	//first argument is the object with the info, the second is the template BUT it needs to be passed
+	// the survey so it can use the survey object meta data
+	//! refer to surveytemplate
 	const mailer = new Mailer(survey, surveyTemplate(survey));
 
 	try {
 		await mailer.send();
+		// send all mail
 		await survey.save();
+		// save survey
 		req.user.credits -= 1;
+		// user loses 1 credit
 		const user = await req.user.save();
 		// saving to db
 
@@ -76,7 +82,11 @@ router.post('/api/surveys', requireLogin, requireCredits, async (req, res) => {
 });
 
 router.post('/api/surveys/webhooks', (req, res) => {
+	// req.body is an array of objects with propertioes such as
+	// email timestap url(with yes or no)
 	const p = new Path('/api/surveys/:surveyId/:choice');
+	//! sendgrid posts every 30 mins or so so its in a batch.
+
 	// this is path parser
 	// so this object filters and extracts variables out of the routes
 	// the surveyID and choice
@@ -84,8 +94,9 @@ router.post('/api/surveys/webhooks', (req, res) => {
 	_.chain(req.body)
 		.map(({ email, url }) => {
 			const match = p.test(new URL(url).pathname);
-			//getting the entire route so
+			// confirming if url matches pathname
 			/// "api/surveys/6152043aee71317754ff2b3c/no"
+			//? path parser library tests and returns desstructed params as variables
 			if (match) {
 				return {
 					email,
@@ -98,6 +109,7 @@ router.post('/api/surveys/webhooks', (req, res) => {
 		.uniqBy('email', 'surveyId')
 		.each(({ surveyId, email, choice }) => {
 			Survey.updateOne(
+				// mongodb syntax from here
 				{
 					_id: surveyId,
 					//when its mongoose id is ok for _id when working internally with mongo u have to specifically use _id
@@ -106,7 +118,9 @@ router.post('/api/surveys/webhooks', (req, res) => {
 					},
 				},
 				{
+					//$inc increments a field by set amount
 					$inc: { [choice]: 1 },
+					// $ between recipients and responded signifies that you are going into nested level schema
 					$set: { 'recipients.$.responded': true },
 					lastResponded: new Date(),
 
